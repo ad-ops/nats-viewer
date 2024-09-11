@@ -8,4 +8,10 @@
     <AssemblyName>$(AssemblyName.Replace(' ', '_'))</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="NATS.Extensions.Microsoft.DependencyInjection" Version="2.3.3" />
+    <PackageReference Include="Nats.Net" Version="2.3.3" />
+  </ItemGroup>
+
+
 </Project>

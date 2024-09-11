@@ -1,7 +1,38 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@using NATS.Client.Core
+@inject INatsConnection nats
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
+@foreach (var message in Messages)
+{
+    <p>@message</p>
+}
 
 Welcome to your new app.
+
+@code {
+    public List<string> Messages { get; set; } = new();
+    private CancellationTokenSource _cts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var task = Task.Run(async () =>  {
+            await foreach (var msg in nats.SubscribeAsync<string>(subject: "hello").WithCancellation(_cts.Token))
+            {
+                Messages.Add(msg.Data ?? "null:-(");
+                await InvokeAsync(StateHasChanged);
+            }
+        });
+        await Task.Yield();
+    }
+
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+}
